@@ -1,6 +1,7 @@
 q = require 'q'
+{EventEmitter} = require 'events'
 
-class InstrumentedContainer
+class InstrumentedContainer extends EventEmitter
   constructor: ->
     @_callbacks =
       before: {}
