@@ -1,0 +1,36 @@
+{
+  "name": "sequences",
+  "description": "",
+  "version": "0.0.1",
+  "homepage": "https://github.com/mattinsler/sequences",
+  "author": {
+    "name": "Matt Insler",
+    "email": "matt.insler@gmail.com",
+    "url": "http://www.mattinsler.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mattinsler/sequences.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mattinsler/sequences/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/mattinsler/sequences/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "dist/sequences",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "q": "~0.9.7"
+  },
+  "devDependencies": {
+    "grunt": "~0.3.15",
+    "grunt-contrib": "~0.3.0"
+  },
+  "keywords": []
+}
