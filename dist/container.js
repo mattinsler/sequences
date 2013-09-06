@@ -25,14 +25,22 @@
       if (seq == null) {
         seq = this.sequences[name] = new Sequence(name);
         seq._container = this;
-        seq._dependencies = [];
-        seq._followed_by = [];
-        seq.depends_on = function(other_sequence) {
-          seq._dependencies.push(other_sequence);
+        seq._runs_after = [];
+        seq._run_after = [];
+        seq._depends_on = [];
+        seq._is_depended_on_by = [];
+        seq.depends_on = function(name) {
+          var other;
+          other = _this.sequence(name);
+          seq._depends_on.push(name);
+          other._is_depended_on_by.push(seq.name);
           return seq;
         };
-        seq.follows = function(other_sequence) {
-          _this.sequences[other_sequence]._followed_by.push(name);
+        seq.runs_after = function(name) {
+          var other;
+          other = _this.sequence(name);
+          seq._runs_after.push(name);
+          other._run_after.push(seq.name);
           return seq;
         };
       }
@@ -60,7 +68,7 @@
     };
 
     Container.prototype.sequence_execution_list = function(name) {
-      var c, deps, queue, visited;
+      var a, c, deps, queue, visited, _i, _len, _ref;
       if (this.sequences[name] == null) {
         return [];
       }
@@ -69,13 +77,17 @@
       queue = [name];
       while (queue.length > 0) {
         c = queue.shift();
-        Array.prototype.push.apply(deps, this.sequences[c]._followed_by);
-        deps.push(c);
         if (visited[c] === true) {
           continue;
         }
         visited[c] = true;
-        Array.prototype.push.apply(queue, this.sequences[c]._dependencies);
+        _ref = this.sequences[c]._run_after;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          a = _ref[_i];
+          Array.prototype.push.apply(deps, this.sequence_execution_list(a));
+        }
+        deps.push(c);
+        Array.prototype.push.apply(queue, this.sequences[c]._depends_on);
       }
       visited = {};
       return deps.reverse().filter(function(d) {

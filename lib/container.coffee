@@ -12,14 +12,31 @@ class Container extends InstrumentedContainer
     unless seq?
       seq = @sequences[name] = new Sequence(name)
       seq._container = @
-      seq._dependencies = []
-      seq._followed_by = []
+      # seq._runs_before = []
+      seq._runs_after = []
+      seq._run_after = []
       
-      seq.depends_on = (other_sequence) =>
-        seq._dependencies.push(other_sequence)
+      seq._depends_on = []
+      seq._is_depended_on_by = []
+      
+      seq.depends_on = (name) =>
+        other = @sequence(name)
+        seq._depends_on.push(name)
+        other._is_depended_on_by.push(seq.name)
         seq
-      seq.follows = (other_sequence) =>
-        @sequences[other_sequence]._followed_by.push(name)
+      
+      # seq.runs_before = (name) =>
+      #   other = @sequence(name)
+      #   # other._runs_before
+      #   
+      #   seq._runs_after.push(name)
+      #   other._runs_before.push(seq.name)
+      #   seq
+      
+      seq.runs_after = (name) =>
+        other = @sequence(name)
+        seq._runs_after.push(name)
+        other._run_after.push(seq.name)
         seq
     
     seq
@@ -40,17 +57,18 @@ class Container extends InstrumentedContainer
     return [] unless @sequences[name]?
 
     visited = {}
-
     deps = []
     queue = [name]
     while queue.length > 0
       c = queue.shift()
-      Array::push.apply(deps, @sequences[c]._followed_by)
-      deps.push(c)
+      
       continue if visited[c] is true
       visited[c] = true
-      Array::push.apply(queue, @sequences[c]._dependencies)
-
+      
+      Array::push.apply(deps, @sequence_execution_list(a)) for a in @sequences[c]._run_after
+      deps.push(c)
+      Array::push.apply(queue, @sequences[c]._depends_on)
+    
     visited = {}
     deps.reverse().filter (d) ->
       return false if visited[d] is true
